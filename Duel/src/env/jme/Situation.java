@@ -161,7 +161,7 @@ public class Situation {
 	public String toCSVFile(){
 		String res = "";//getCSVColumns()+"\n";
 		
-		res+=offSize+";"+defSize+";"+offValue+";"+defValue+";"+averageAltitude+";"+minAltitude+";"+maxAltitude+";"+currentAltitude+";"+fovValue+";"+lastAction+";"+life
+		res+=offSize+";"+defSize+";"+offValue+";"+defValue+";"+minAltitude+";"+maxAltitude+";"+currentAltitude+";"+fovValue+";"+lastAction+";"+life
 				+";"+impactProba+";";
 		
 		res+= (victory)?"VICTORY":"DEFEAT";
@@ -172,7 +172,7 @@ public class Situation {
 	public String toCSVFileHeightRandom() {
 		String res = "";//getCSVColumns()+"\n";
 		
-		res+=averageAltitude/compteur+","+minAltitude+","+maxAltitude+","+currentAltitude+","+fovValue+","+lastAction+","+life
+		res+=minAltitude+","+maxAltitude+","+currentAltitude+","+fovValue+","+lastAction+","+life
 				+","+impactProba+",";
 		
 		res+= (victory)?"VICTORY":"DEFEAT";

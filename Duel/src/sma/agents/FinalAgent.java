@@ -112,9 +112,11 @@ public class FinalAgent extends AbstractAgent{
 				
 				//addBehaviour(new PrologBehavior(this,PERIOD));
 				addBehaviour(new PrologHeightRandomBehavior(this,PERIOD));
+				//addBehaviour(new LearningProlog(this,PERIOD,getClassifierJ48()));
 			}else{
 				addBehaviour(new DumbBehavior(this, PERIOD));
 			}
+			
 			
 			deployAgent((NewEnv) args[0], useProlog);
 			
