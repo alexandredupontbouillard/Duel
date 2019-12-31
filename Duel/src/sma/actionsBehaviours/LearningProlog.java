@@ -1,10 +1,14 @@
 package sma.actionsBehaviours;
 
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
 
 import weka.classifiers.trees.J48;
+import weka.core.Instances;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -183,11 +187,76 @@ public class LearningProlog extends TickerBehaviour{
 		//System.out.println("retreat");
 		//nextBehavior = RetreatBehavior.class;
 	}
-	public static void moveAttack() {
+	public static void moveAttack()  {
 		ArrayList<Vector3f> points = agent.sphereCast(agent.getSpatial(), AbstractAgent.NEIGHBORHOOD_DISTANCE, AbstractAgent.CLOSE_PRECISION, AbstractAgent.VISION_ANGLE);
 		String res = "";//getCSVColumns()+"\n";
 		
-		res+=sit.minAltitude+","+sit.maxAltitude+","+sit.currentAltitude+","+sit.fovValue+","+sit.lastAction+","+sit.life
-				+","+sit.impactProba;
+	
+		ArrayList<String> listP = new ArrayList<String>();
+		for(int i = 0 ; i < points.size();i++) {
+			//listP.add(points.get(i).)
+			//ajouter la description du point sous format arff dans la liste listP
+		}
+		
+		try{
+		    File file = new File(System.getProperty("user.dir")+"/ressources/simushoot/classify.arff");
+		    FileWriter fr = new FileWriter(file);
+		    BufferedWriter br = new BufferedWriter(fr);
+		    PrintWriter pr = new PrintWriter(br);
+		    pr.println("@relation shoot ");
+		    pr.println("@attribute minAltitude REAL");
+		    pr.println("@attribute maxAltitude REAL");
+		    pr.println("@attribute currentAltitude REAL");
+		    pr.println("@attribute fovValue REAL");
+		    pr.println("@attribute lastAction {explore_off,explore_def,follow,shoot}");
+		    pr.println("@attribute life numeric");
+		    pr.println("@attribute impactProba REAL");
+		    pr.println("@data");
+		    for(int i = 0 ; i < listP.size();i++){
+		    	pr.println(listP.get(i));
+		    }
+		    pr.close();
+		    br.close();
+		    fr.close();
+		    System.out.println(System.getProperty("user.dir"));
+		}
+		catch (IOException e) {
+			  System.out.println(e);
+			  System.out.println("saving points failed");
+			}
+		 Instances unlabeled;
+		try {
+			unlabeled = new Instances(
+			         new BufferedReader(
+			           new FileReader("/ressources/simushoot/classify.arff")));
+			// set class attribute
+			unlabeled.setClassIndex(unlabeled.numAttributes() - 1);
+			
+			// create copy
+			Instances labeled = new Instances(unlabeled);
+			double clsLabel;
+			// label instances
+			for (int i = 0; i < unlabeled.numInstances(); i++) {
+			
+			try {
+				clsLabel = tree.classifyInstance(unlabeled.instance(i));
+				labeled.instance(i).setClassValue(clsLabel);
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+			}
+		} 
+		
+		catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		
+
+		
+		
 	}
 }
