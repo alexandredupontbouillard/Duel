@@ -173,7 +173,7 @@ public class Situation {
 		String res = "";//getCSVColumns()+"\n";
 		
 		res+=minAltitude+","+maxAltitude+","+currentAltitude+","+fovValue+","+lastAction+","+life
-				+","+impactProba+",";
+				+",";
 		
 		res+= (victory)?"VICTORY":"DEFEAT";
 		
@@ -183,7 +183,7 @@ public class Situation {
 		String res = "";//getCSVColumns()+"\n";
 		
 		res+=averageAltitude/compteur+","+minAltitude+","+maxAltitude+","+currentAltitude+","+fovValue+","+lastAction+","+life
-				+","+impactProba;
+				+",";
 		
 		return res;
 	}

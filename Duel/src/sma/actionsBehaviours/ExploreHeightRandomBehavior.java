@@ -57,7 +57,6 @@ public class ExploreHeightRandomBehavior extends TickerBehaviour {
 
 	
 	protected void onTick(){
-		
 		if (target == null && !setTarget()){ 
 			Random rand = new Random();
 			int r = rand.nextInt(100);

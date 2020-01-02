@@ -18,6 +18,7 @@ import sma.InterestPoint;
 import sma.actionsBehaviours.DumbBehavior;
 import sma.actionsBehaviours.ExploreBehavior;
 import sma.actionsBehaviours.HuntBehavior;
+import sma.actionsBehaviours.LearningProlog;
 import sma.actionsBehaviours.PrologBehavior;
 import sma.actionsBehaviours.PrologHeightRandomBehavior;
 import sma.actionsBehaviours.TempSphereCast;
@@ -111,8 +112,8 @@ public class FinalAgent extends AbstractAgent{
 			if(useProlog){
 				
 				//addBehaviour(new PrologBehavior(this,PERIOD));
-				addBehaviour(new PrologHeightRandomBehavior(this,PERIOD));
-				//addBehaviour(new LearningProlog(this,PERIOD,getClassifierJ48()));
+				//addBehaviour(new PrologHeightRandomBehavior(this,PERIOD));
+				addBehaviour(new LearningProlog(this,PERIOD,getClassifierJ48()));
 			}else{
 				addBehaviour(new DumbBehavior(this, PERIOD));
 			}
@@ -132,9 +133,11 @@ public class FinalAgent extends AbstractAgent{
 		J48 tree = new J48();
 		try {
 			DataSource source = new DataSource(System.getProperty("user.dir")+"/ressources/simus/HeightRandom.arff");
+			
 			Instances data = source.getDataSet();
-			if(data.classIndex() == -1)
-				data.setClassIndex(data.numAttributes()-1);
+			
+			//if(data.classIndex() == -1)
+			data.setClassIndex(data.numAttributes()-1);
 			tree.buildClassifier(data);
 			//Evaluation eval = new Evaluation(data);
 			//eval.crossValideModel(tree,data,10,new Random(1));

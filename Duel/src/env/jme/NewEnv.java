@@ -64,11 +64,12 @@ import com.jogamp.opengl.math.geom.Frustum;
 import dataStructures.tuple.Tuple2;
 import env.terrain.TerrainTools;
 import sma.AbstractAgent;
+import sma.actionsBehaviours.LearningProlog;
 import sma.actionsBehaviours.LegalActions;
 import sma.actionsBehaviours.LegalActions.LegalAction;
 import sma.actionsBehaviours.LegalActions.Orientation;
 import sma.actionsBehaviours.PrologBehavior;
-import sma.actionsBehaviours.PrologHeightRandomBehavior;
+import sma.actionsBehaviours.LearningProlog;
 import sma.agents.FinalAgent;
 
 
@@ -485,7 +486,7 @@ public class NewEnv extends SimpleApplication {
 						
 						if(!enemy.equals("Player1")){
 							//PrologBehavior.sit.victory = true;
-							PrologHeightRandomBehavior.sit.victory = true;
+							LearningProlog.sit.victory = true;
 						}
 						
 						//saveCSV();
@@ -531,7 +532,7 @@ public class NewEnv extends SimpleApplication {
 
 	public static void saveCSVHeightRandom(){
 		
-		String res = PrologHeightRandomBehavior.sit.toCSVFileHeightRandom();
+		String res = LearningProlog.sit.toCSVFileHeightRandom();
 		System.out.println(res);
 		try{
 		    File file = new File(System.getProperty("user.dir")+"/ressources/simus/HeightRandom.arff");
@@ -552,8 +553,8 @@ public class NewEnv extends SimpleApplication {
 	}
 	
 	public static void saveCSVHeightRandomShoot(){
-		
-		String res = PrologHeightRandomBehavior.sit.toCSVFileHeightRandomShoot();
+		Situation res = LearningProlog.sit;
+		/*String res = LearningProlog.sit.toCSVFileHeightRandomShoot();
 		System.out.println(res);
 		try{
 		    File file = new File(System.getProperty("user.dir")+"/ressources/simushoot/HeightRandomShoot.arff");
@@ -569,7 +570,7 @@ public class NewEnv extends SimpleApplication {
 		} catch (IOException e) {
 		  System.out.println(e);
 		  System.out.println("Experiment saving failed");
-		}
+		}*/
 		
 	}
 	

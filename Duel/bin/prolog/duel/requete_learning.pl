@@ -20,7 +20,7 @@ shotImpact(Probability):-
 explore(Time,Size,Radius,MapWidth):-
 	not(being_attacked(Time)),
 	areaCovered(Radius,Size,MapWidth),
-	jpl_call('sma.actionsBehaviours.PrologHeightRandomBehavior',executeExplore,[],@(void)).
+	jpl_call('sma.actionsBehaviours.LearningProlog',executeExplore,[],@(void)).
 
 hunt(Life,Time,OffSize,DefSize,Radius,MapWidth,EnemyInSight):-
 	not(being_attacked(Time)),
@@ -37,7 +37,6 @@ toOpenFire(EnemyInSight,P):-
 
 attack(EnemyInSight):-
 	EnemyInSight,
-    jpl_call('sma.actionsBehaviours.LearningProlog',moveAttack,[],@(void)),
 	jpl_call('sma.actionsBehaviours.LearningProlog',executeAttack,[],@(void)).
 
 

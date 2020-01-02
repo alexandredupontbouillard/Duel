@@ -55,6 +55,8 @@ public class LearningProlog extends TickerBehaviour{
 			}
 			else {
 				sit = Situation.getCurrentSituation(agent);
+				moveAttack();
+
 				List<String> behavior = Arrays.asList("explore", "hunt", "attack");
 				ArrayList<Object> terms = new ArrayList<Object>();
 
@@ -63,7 +65,7 @@ public class LearningProlog extends TickerBehaviour{
 					// Get parameters 
 					if (b.equals("explore")) {
 						terms.add(sit.timeSinceLastShot);
-						terms.add(((ExploreHeightRandomBehavior.prlNextOffend)?sit.offSize:sit.defSize ));
+						terms.add(((LearningExplore.prlNextOffend)?sit.offSize:sit.defSize ));
 						terms.add(InterestPoint.INFLUENCE_ZONE);
 						terms.add(NewEnv.MAX_DISTANCE);
 					}
@@ -79,6 +81,7 @@ public class LearningProlog extends TickerBehaviour{
 						//terms.add(sit.life);
 						terms.add(sit.enemyInSight);
 						//terms.add(sit.impactProba);
+						
 					}
 					else { // RETREAT
 						terms.add(sit.life);
@@ -92,9 +95,6 @@ public class LearningProlog extends TickerBehaviour{
 
 					}
 				}
-				if(sit.enemyInSight) {
-					saveCSVHeightRandomSee();
-				}
 			}
 			
 		}catch(Exception e) {
@@ -102,30 +102,6 @@ public class LearningProlog extends TickerBehaviour{
 			System.exit(0);
 		}
 	}
-	public static void saveCSVHeightRandomSee(){
-			
-			String res = sit.toCSVFileHeightRandomSee();
-			
-			System.out.println(res);
-			try{
-			    File file = new File(System.getProperty("user.dir")+"/ressources/simushoot/HeightRandomSee.arff");
-			    FileWriter fr = new FileWriter(file,true);
-			    BufferedWriter br = new BufferedWriter(fr);
-			    PrintWriter pr = new PrintWriter(br);
-			    pr.println(res);
-			    pr.close();
-			    br.close();
-			    fr.close();
-			    System.out.println(System.getProperty("user.dir"));
-			    System.out.println("View result saved in /ressources/simushoot/");
-			} catch (IOException e) {
-			  System.out.println(e);
-			  System.out.println("Experiment saving failed");
-			}
-			
-		}
-
-
 
 	public void setNextBehavior(){
 
@@ -136,8 +112,8 @@ public class LearningProlog extends TickerBehaviour{
 			agent.removeBehaviour(agent.currentBehavior);
 		}
 
-		if (nextBehavior == ExploreHeightRandomBehavior.class){
-			ExploreHeightRandomBehavior ex = new ExploreHeightRandomBehavior(agent, FinalAgent.PERIOD);
+		if (nextBehavior == LearningExplore.class){
+			LearningExplore ex = new LearningExplore(agent, FinalAgent.PERIOD);
 			agent.addBehaviour(ex);
 			agent.currentBehavior = ex;
 
@@ -146,9 +122,9 @@ public class LearningProlog extends TickerBehaviour{
 			agent.currentBehavior = h;
 			agent.addBehaviour(h);
 
-		}else if(nextBehavior == AttackHeightRandom.class){
+		}else if(nextBehavior == LearningAttack.class){
 
-			AttackHeightRandom a = new AttackHeightRandom(agent, FinalAgent.PERIOD, sit.enemy);
+			LearningAttack a = new LearningAttack(agent, FinalAgent.PERIOD, sit.enemy,this);
 			agent.currentBehavior = a;
 			agent.addBehaviour(a);
 
@@ -168,7 +144,7 @@ public class LearningProlog extends TickerBehaviour{
 
 	public static void executeExplore() {
 		//System.out.println("explore");
-		nextBehavior = ExploreHeightRandomBehavior.class;
+		nextBehavior = LearningExplore.class;
 	}
 
 
@@ -179,7 +155,7 @@ public class LearningProlog extends TickerBehaviour{
 
 	public static void executeAttack() {
 		//System.out.println("attack");
-		nextBehavior = AttackHeightRandom.class;
+		nextBehavior = LearningAttack.class;
 	}
 
 
@@ -187,15 +163,18 @@ public class LearningProlog extends TickerBehaviour{
 		//System.out.println("retreat");
 		//nextBehavior = RetreatBehavior.class;
 	}
-	public static void moveAttack()  {
+	public static Vector3f moveAttack()  {
 		ArrayList<Vector3f> points = agent.sphereCast(agent.getSpatial(), AbstractAgent.NEIGHBORHOOD_DISTANCE, AbstractAgent.CLOSE_PRECISION, AbstractAgent.VISION_ANGLE);
+		
 		String res = "";//getCSVColumns()+"\n";
 		
-	
+		
 		ArrayList<String> listP = new ArrayList<String>();
+		String s;
 		for(int i = 0 ; i < points.size();i++) {
-			//listP.add(points.get(i).)
-			//ajouter la description du point sous format arff dans la liste listP
+			s = sit.minAltitude+","+sit.maxAltitude+","+points.get(i).z+","+sit.fovValue+","+sit.lastAction+","+sit.life+",?,";
+
+			listP.add(s);
 		}
 		
 		try{
@@ -208,17 +187,19 @@ public class LearningProlog extends TickerBehaviour{
 		    pr.println("@attribute maxAltitude REAL");
 		    pr.println("@attribute currentAltitude REAL");
 		    pr.println("@attribute fovValue REAL");
-		    pr.println("@attribute lastAction {explore_off,explore_def,follow,shoot}");
+		    pr.println("@attribute lastAction {explore_off,explore_def,follow,shoot,idle}");
 		    pr.println("@attribute life numeric");
-		    pr.println("@attribute impactProba REAL");
+		    pr.println("@attribute result {DEFEAT,VICTORY}");
+		    pr.println("");
 		    pr.println("@data");
+		    pr.println("");
+		    pr.println("");
 		    for(int i = 0 ; i < listP.size();i++){
 		    	pr.println(listP.get(i));
 		    }
 		    pr.close();
 		    br.close();
 		    fr.close();
-		    System.out.println(System.getProperty("user.dir"));
 		}
 		catch (IOException e) {
 			  System.out.println(e);
@@ -228,25 +209,33 @@ public class LearningProlog extends TickerBehaviour{
 		try {
 			unlabeled = new Instances(
 			         new BufferedReader(
-			           new FileReader("/ressources/simushoot/classify.arff")));
+			           new FileReader(System.getProperty("user.dir")+"/ressources/simushoot/classify.arff")));
 			// set class attribute
-			unlabeled.setClassIndex(unlabeled.numAttributes() - 1);
-			
+			unlabeled.setClassIndex(unlabeled.numAttributes() - 1);			
 			// create copy
 			Instances labeled = new Instances(unlabeled);
 			double clsLabel;
 			// label instances
+			
 			for (int i = 0; i < unlabeled.numInstances(); i++) {
+				
+				try {
+					//System.out.println(unlabeled.instance(i));
+					clsLabel = tree.classifyInstance(unlabeled.instance(i));
+					labeled.instance(i).setClassValue(clsLabel);
+					//System.out.println(clsLabel + " -> " + unlabeled.classAttribute().value((int) clsLabel));
+					if(unlabeled.classAttribute().value((int) clsLabel).equals("VICTORY")) {
+						return points.get(i);
+					}
+					
+	
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			
-			try {
-				clsLabel = tree.classifyInstance(unlabeled.instance(i));
-				labeled.instance(i).setClassValue(clsLabel);
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
 			}
 			
-			}
 		} 
 		
 		catch (IOException e) {
@@ -255,6 +244,8 @@ public class LearningProlog extends TickerBehaviour{
 		}
 		
 		
+		
+	return null; 
 
 		
 		
